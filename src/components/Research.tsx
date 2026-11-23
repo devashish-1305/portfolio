@@ -1,17 +1,17 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { reduce } from '../fx';
+import { research as c } from '../content';
+import { Rich, fill } from '../rich';
 
-// [trading day, mean CAR %, CI low, CI high]
-const D: [number, number, number, number][] = [[0, 0, 0, 0], [1, 1.22, 0.98, 1.46], [5, 1.47, 1.15, 1.79], [30, 1.65, 1.05, 2.25], [60, 3.23, 2.18, 4.28]];
+const D = c.chart.points;
 const X = (v: number) => 50 + v * (570 / 60), Y = (v: number) => 212 - v * 48;
 const TRACE = D.map(p => X(p[0]) + ',' + Y(p[1])).join(' ');
 const BAND = D.map(p => X(p[0]) + ',' + Y(p[3])).concat(D.slice().reverse().map(p => X(p[0]) + ',' + Y(p[2]))).join(' ');
 const GRID_Y = [260, 212, 164, 116, 68, 20];
-const AXIS = ['-1%', '0%', '1%', '2%', '3%', '4%'];
 
 /** Insider-cluster event study, drawn as a telemetry trace. */
 export default function Research() {
-  const [sel, setSel] = useState(30);
+  const [sel, setSel] = useState(c.chart.defaultDay);
   const scope = useRef<SVGSVGElement>(null);
   const trace = useRef<SVGPolylineElement>(null);
   const band = useRef<SVGPolygonElement>(null);
@@ -34,16 +34,16 @@ export default function Research() {
   return (
     <section className="s" id="research">
       <div className="s-head">
-        <h2>Research</h2>
-        <p>F1 teams win on telemetry: decide what to measure, then trust the data. I ran my own quant study the same way. <strong>When three or more company insiders buy their own stock within 30 days, does the price follow?</strong></p>
+        <h2>{c.title}</h2>
+        <p><Rich text={c.intro} /></p>
       </div>
       <div className="research">
         <div className="scope">
-          <div className="bar"><span>Extra return over the market after an insider cluster, with 95% confidence band</span><span className="live">DAY {sel}: +{selP[1].toFixed(2)}%</span></div>
-          <svg viewBox="0 0 640 300" ref={scope} role="img" aria-label="Mean cumulative abnormal return rises to 1.22% after one day, 1.65% after 30 trading days and 3.23% after 60.">
+          <div className="bar"><span>{c.chart.caption}</span><span className="live">{fill(c.chart.readout, { day: sel, value: selP[1].toFixed(2) })}</span></div>
+          <svg viewBox="0 0 640 300" ref={scope} role="img" aria-label={c.chart.aria}>
             <g className="grid">{GRID_Y.map(y => <line key={y} x1="50" y1={y} x2="620" y2={y} />)}</g>
-            {GRID_Y.map((y, i) => <text key={y} className="axis" x="40" y={y + 4} textAnchor="end">{AXIS[i]}</text>)}
-            <text className="axis" x="335" y="296" textAnchor="middle">Trading days after the cluster</text>
+            {GRID_Y.map((y, i) => <text key={y} className="axis" x="40" y={y + 4} textAnchor="end">{c.chart.yAxis[i]}</text>)}
+            <text className="axis" x="335" y="296" textAnchor="middle">{c.chart.xAxis}</text>
             <line className="zero" x1="50" y1="212" x2="620" y2="212" />
             <polygon className="band" ref={band} points={BAND} /><polyline className="trace" ref={trace} points={TRACE} />
             <g>
@@ -61,21 +61,17 @@ export default function Research() {
         </div>
         <div>
           <div className="readouts">
-            <div className="ro"><div className="n">+1.65%</div><div className="u">average extra return over 30 trading days</div></div>
-            <div className="ro"><div className="n">5.42</div><div className="u">t-statistic, p &lt; 1e-7</div></div>
-            <div className="ro"><div className="n">2,664</div><div className="u">insider clusters, US stocks 2015–2024</div></div>
-            <div className="ro"><div className="n">1,030</div><div className="u">companies in the sample</div></div>
+            {c.readouts.map(r => <div className="ro" key={r.u}><div className="n">{r.n}</div><div className="u">{r.u}</div></div>)}
           </div>
           <div className="notes">
-            <p><strong>Pre-registered.</strong> The signal, filters and tests were fixed before I saw a single result, so the finding couldn't be shaped afterwards.</p>
-            <p>It holds under risk adjustment, other cluster definitions and both halves of the decade. It's observational, not causal, and trading costs aren't modelled yet.</p>
+            {c.notes.map(n => <p key={n}><Rich text={n} /></p>)}
           </div>
-          <div className="cta"><a className="btn" href="https://github.com/devashish-1305/insider-cluster-alpha">Read the paper and code</a></div>
+          <div className="cta"><a className="btn" href={c.link.href}>{c.link.label}</a></div>
         </div>
       </div>
       <div className="thread">
-        <b>Why it's here</b>
-        <p>It's the same habit behind <a href="#highlights">deal-radar and repo2bench</a>: decide the test before you see the result, then report what the data says, even when it's boring. Next up is <strong style={{ color: 'var(--chalk)' }}>Alphatrace</strong>, a research system that logs every hypothesis tested, not just the ones that worked.</p>
+        <b>{c.thread.title}</b>
+        <p><Rich text={c.thread.text} boldStyle={{ color: 'var(--chalk)' }} /></p>
       </div>
     </section>
   );

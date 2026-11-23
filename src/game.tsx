@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { showPop, type PopOpts } from './fx';
 
-export type CursorKind = 'ball' | 'tennis' | 'f1' | 'run' | 'mic' | 'story';
+import type { CursorKind } from './content';
+export type { CursorKind };
 export type CursorApi = { set(c: CursorKind): void; toggleGold(): boolean };
 
 type Stats = { pass: boolean; race: boolean; hl: Set<number>; cards: Set<number> };

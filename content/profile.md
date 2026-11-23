@@ -15,7 +15,7 @@
 - Pitch: a problem solver and the bridge between people's ideas and execution. Most problems stay problems because they aren't communicated well; he turns what people mean into systems that ship. "Talk is cheap."
 - Core principle: the model proposes, deterministic code decides.
 - Looking for: AI Engineer, Forward Deployed Engineer, GenAI Engineer, AI Solutions or Applied AI roles, close to users or customers.
-- Locations: Gurugram, Delhi, Noida, Bengaluru, Mumbai (onsite or hybrid).
+- Locations: Bengaluru, Gurugram, Mumbai (onsite or hybrid), or remote anywhere in the world.
 - Availability: immediate, no notice period.
 - Education: B.Tech in AI & ML, Ajay Kumar Garg Engineering College, Ghaziabad (AKTU), 2021-2025, CGPA 7.0/10.
 - Contact: devashish.dwivedi.13@gmail.com | linkedin.com/in/devashish-dwivedi | github.com/devashish-1305

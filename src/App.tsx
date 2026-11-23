@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { attachCanvas, reduce } from './fx';
+import { pops, site } from './content';
 import { GameProvider, useGame } from './game';
 import SvgDefs from './components/SvgDefs';
 import CursorBall from './components/CursorBall';
@@ -40,7 +41,7 @@ function Page() {
         <OffTheClock />
         <FullTime />
       </main>
-      <footer>Built by Devashish Dwivedi. Every number on this page is from my own work.</footer>
+      <footer>{site.footer}</footer>
     </>
   );
 }
@@ -58,7 +59,7 @@ function useEasterEggs() {
       buf = (buf + e.key.toLowerCase()).slice(-8);
       if (buf.endsWith('messi')) {
         const on = cursor.current?.toggleGold() ?? false;
-        pop(on ? 'GOAT' : 'CLASSIC', innerWidth / 2, innerHeight / 2, { big: true, noscore: true });
+        pop(on ? pops.messiOn : pops.messiOff, innerWidth / 2, innerHeight / 2, { big: true, noscore: true });
         buf = '';
       }
       if (buf.endsWith('max')) {

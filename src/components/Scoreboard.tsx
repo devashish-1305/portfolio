@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { header } from '../content';
 import { reduce } from '../fx';
 import { useGame } from '../game';
 
@@ -6,7 +7,8 @@ import { useGame } from '../game';
 export default function Scoreboard() {
   const { goals } = useGame();
   const led = useRef<HTMLDivElement>(null);
-  const [secs, setSecs] = useState(23 * 60);
+  const sb = header.scoreboard;
+  const [secs, setSecs] = useState(sb.clockStartMinutes * 60);
 
   useEffect(() => {
     if (reduce) return;
@@ -22,13 +24,13 @@ export default function Scoreboard() {
 
   return (
     <header className="board">
-      <a className="crest" href="#top" aria-label="Back to the top"><i>8</i>Devashish</a>
-      <nav className="nav" aria-label="Sections">
-        <a href="#career">Career</a><a href="#highlights">Projects</a><a href="#research">Research</a><a href="#how">How I play</a><a href="#off">Off the clock</a><a href="#fulltime">Contact</a>
+      <a className="crest" href="#top" aria-label={header.crestAria}><i>{header.crestNumber}</i>{header.crestName}</a>
+      <nav className="nav" aria-label={header.navAria}>
+        {header.nav.map(l => <a key={l.href} href={l.href}>{l.label}</a>)}
       </nav>
-      <div className="led" ref={led} title="Talk is cheap. Everything you do on this page counts as action.">
-        <span>TALK</span><span className="score" role="status" aria-live="polite" aria-label="Score">0-{goals}</span><span>ACTION</span>
-        <span className="clock" title="Twenty-three and already on the scoresheet">{Math.floor(secs / 60)}:{String(secs % 60).padStart(2, '0')}</span>
+      <div className="led" ref={led} title={sb.title}>
+        <span>{sb.left}</span><span className="score" role="status" aria-live="polite" aria-label={sb.scoreAria}>0-{goals}</span><span>{sb.right}</span>
+        <span className="clock" title={sb.clockTitle}>{Math.floor(secs / 60)}:{String(secs % 60).padStart(2, '0')}</span>
       </div>
     </header>
   );

@@ -1,15 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { burst, reduce } from '../fx';
 import { useGame } from '../game';
+import { hero, pops } from '../content';
+import { Rich } from '../rich';
 
-const STEPS = [
-  { x: 62, y: 350, t: 'Your idea', d: 'Someone has a problem, or half an idea of a fix.', cls: 'you', lx: 0, ly: 42 },
-  { x: 170, y: 250, t: 'Listen', d: 'I sit with them until I can say the problem back in plain words.', cls: '', lx: -6, ly: -26 },
-  { x: 300, y: 300, t: 'Translate', d: 'Turn it into a plan both the business and the engineers sign off on.', cls: '', lx: 0, ly: 44 },
-  { x: 385, y: 170, t: 'Build', d: 'End to end: data, model, API and the screen someone clicks.', cls: '', lx: -10, ly: -26 },
-  { x: 470, y: 250, t: 'Prove', d: 'Evals, tests and numbers before anyone has to trust it.', cls: '', lx: 12, ly: 44 },
-  { x: 568, y: 80, t: 'Goal', d: 'It ships, and it still holds up once it’s live.', cls: 'goal', lx: -50, ly: 60 },
-];
+const STEPS = hero.pass.steps;
+const LAST = STEPS.length - 1;
 
 // Curved segments between the nodes, alternating sides.
 const SEG_D: string[] = [];
@@ -48,14 +44,14 @@ export default function Hero() {
 
     const finish = () => {
       const r = board.current!.getBoundingClientRect();
-      if (live.current.first('pass')) live.current.pop('GOAL!', r.left + r.width * 0.85, r.top + r.height * 0.25, { big: true });
+      if (live.current.first('pass')) live.current.pop(pops.pass, r.left + r.width * 0.85, r.top + r.height * 0.25, { big: true });
       else burst(r.left + r.width * 0.9, r.top + r.height * 0.2, 40);
     };
 
     const playPass = (user: boolean) => {
       if (playing.current) { if (user) wantUser.current = true; return; }
       wantUser.current = user; playing.current = true; light(0); setBall(STEPS[0].x, STEPS[0].y);
-      if (reduce) { light(5); setBall(STEPS[5].x, STEPS[5].y); playing.current = false; if (user) finish(); return; }
+      if (reduce) { light(LAST); setBall(STEPS[LAST].x, STEPS[LAST].y); playing.current = false; if (user) finish(); return; }
       let i = 0;
       const next = () => {
         if (i >= SEG_D.length) { playing.current = false; if (wantUser.current) finish(); return; }
@@ -85,20 +81,18 @@ export default function Hero() {
   const pick = (i: number) => { if (playing.current) return; setBall(STEPS[i].x, STEPS[i].y); light(i); };
 
   return (
-    <section className="hero" aria-label="Summary">
+    <section className="hero" aria-label={hero.aria}>
       <div>
-        <h1>I play the pass between the idea and the goal.</h1>
-        <p className="sum"><strong>Devashish Dwivedi, 23, AI builder in Gurugram.</strong> Most problems stay problems because nobody passes them on properly. I sit between the business and the engineers, turn what people mean into AI systems that ship, and make sure they still work once they're live. Talk is cheap. I play the ball.</p>
+        <h1>{hero.title}</h1>
+        <p className="sum"><Rich text={hero.summary} /></p>
         <div className="facts">
-          <div>3.5 yrs<span>building ML and LLM systems</span></div>
-          <div>3<span>production systems shipped at Benefi</span></div>
-          <div>Now<span>available to join, no notice period</span></div>
+          {hero.facts.map(f => <div key={f.label}>{f.value}<span>{f.label}</span></div>)}
         </div>
-        <div className="cta"><a className="btn solid" href="#highlights">See the projects</a><a className="btn" href="#fulltime">Get in touch</a></div>
+        <div className="cta"><a className="btn solid" href={hero.cta.primary.href}>{hero.cta.primary.label}</a><a className="btn" href={hero.cta.secondary.href}>{hero.cta.secondary.label}</a></div>
       </div>
 
       <div className="tele">
-        <svg viewBox="0 0 600 420" ref={board} aria-label="How I work, as a pass from your idea to a shipped goal">
+        <svg viewBox="0 0 600 420" ref={board} aria-label={hero.pass.aria}>
           <g className="deco" aria-hidden="true">
             <path d="M0 210 H600" /><circle cx="300" cy="210" r="70" />
             <rect x="470" y="40" width="130" height="150" />
@@ -125,9 +119,9 @@ export default function Hero() {
           <use href="#ball" ref={ball} width="26" height="26" x="-13" y="-13" />
         </svg>
         <div className="caption" aria-live="polite">
-          <span className="step">{cap + 1}/6</span>
+          <span className="step">{cap + 1}/{STEPS.length}</span>
           <div><h4>{STEPS[cap].t}</h4><p>{STEPS[cap].d}</p></div>
-          <button className="replay" onClick={() => playRef.current(true)}>Play the pass</button>
+          <button className="replay" onClick={() => playRef.current(true)}>{hero.pass.replay}</button>
         </div>
       </div>
     </section>
