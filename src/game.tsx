@@ -5,14 +5,14 @@ import type { CursorKind } from './content';
 export type { CursorKind };
 export type CursorApi = { set(c: CursorKind): void; toggleGold(): boolean };
 
-type Stats = { pass: boolean; race: boolean; resume: boolean; hl: Set<number>; cards: Set<number> };
+type Stats = { pass: boolean; race: boolean; resume: boolean; chat: boolean; hl: Set<number>; cards: Set<number> };
 export type StatKey = keyof Stats;
 
 type Game = {
   goals: number;
   stats: Stats;
   /** Records an achievement. Returns true the first time (and only then). */
-  first(k: 'pass' | 'race' | 'resume'): boolean;
+  first(k: 'pass' | 'race' | 'resume' | 'chat'): boolean;
   first(k: 'hl' | 'cards', idx: number): boolean;
   pop(text: string, x: number, y: number, opts?: PopOpts & { noscore?: boolean }): void;
   cursor: RefObject<CursorApi | null>;
@@ -24,13 +24,13 @@ const Ctx = createContext<Game | null>(null);
 export function GameProvider({ children }: { children: ReactNode }) {
   const [goals, setGoals] = useState(0);
   const [version, rerender] = useState(0);
-  const stats = useRef<Stats>({ pass: false, race: false, resume: false, hl: new Set(), cards: new Set() }).current;
+  const stats = useRef<Stats>({ pass: false, race: false, resume: false, chat: false, hl: new Set(), cards: new Set() }).current;
   const cursor = useRef<CursorApi | null>(null);
   const race = useRef<(() => void) | null>(null);
 
   const first = useCallback((k: StatKey, idx?: number) => {
     let isNew = false;
-    if (k === 'pass' || k === 'race' || k === 'resume') { isNew = !stats[k]; stats[k] = true; }
+    if (k === 'pass' || k === 'race' || k === 'resume' || k === 'chat') { isNew = !stats[k]; stats[k] = true; }
     else { isNew = !stats[k].has(idx!); stats[k].add(idx!); }
     if (isNew) rerender(n => n + 1);
     return isNew;

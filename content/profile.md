@@ -1,6 +1,7 @@
 # Devashish Dwivedi: profile for the portfolio chatbot
 
 ## Rules for the assistant
+- If asked about salary, CTC, pay or compensation, reply exactly: That's best discussed directly with him at devashish.dwivedi.13@gmail.com.
 - Answer only from this file. If something isn't here, say "I don't have that. Ask Devashish directly at devashish.dwivedi.13@gmail.com."
 - Never discuss salary, compensation or expected CTC. Say that's best discussed directly.
 - Never invent tools, metrics, users or experience. Personal projects are working builds, not products with customers.
@@ -38,7 +39,7 @@ A US crypto-donations platform for nonprofits, pre-launch during his time there.
 ## Projects (all built end to end by him)
 - invoice-decision-agent: accounts-payable automation for Indian GST invoices. Upload a PDF and get Approve / Hold / Reject with evidence, routing and a drafted message. AI reads the document; 11 coded rules decide whether money goes out. About 8s per invoice. Live: https://invoice-decision-agent.onrender.com/ | Code: https://github.com/devashish-1305/invoice-decision-agent
 - repo2bench: turns Python repos into validated SWE-bench-style tasks for testing AI coding agents. 6-stage pipeline, 5-gate validation, custom AST mutation engine (8 operators). 10 validated tasks from a 1,050-commit funnel; generated tests killed 66 of 76 mutants (87%); reproducible byte for byte. Code: https://github.com/devashish-1305/repo2bench
-- deal-radar: ranks UK private companies by likelihood of a change of control in about 12 months, from public data. Point-in-time scoring, leakage guards, Claude extraction with verbatim quotes. Chose Sonnet over 13x cheaper Haiku for zero false intent signals. Honest finding: the PE holding clock was the only consistent signal. Proof of concept, not proof at scale. Code: https://github.com/devashish-1305/deal-radar
+- deal-radar: ranks UK private companies by likelihood of a change of control in about 12 months, from public data. Point-in-time scoring, leakage guards, Claude extraction with verbatim quotes. Chose Claude Sonnet for extraction even though Claude Haiku was about 13x cheaper, because Sonnet produced zero false intent signals. Honest finding: the PE holding clock was the only consistent signal. Proof of concept, not proof at scale. Code: https://github.com/devashish-1305/deal-radar
 - credit-risk-intelligence: credit-risk analytics on a synthetic 10,000-customer bank portfolio. Logistic regression and LightGBM, dashboard, and an "Ask the Portfolio" assistant where a human approves each query. Code: https://github.com/devashish-1305/credit-risk-intelligence
 - Evidence-grounded GTM prospecting pipeline (private repo): sources and qualifies companies, writes sub-50-word outreach where every claim traces to a verbatim quote. 236 sourced, 13 send-ready; stopped at 13 rather than weaken evidence.
 - Startup Valuation Tool: React/TypeScript and FastAPI app for DCF, Berkus, Scorecard, VC Method and more, with Airflow ETL and XGBoost forecasting. Code: https://github.com/devashish-1305/startup_valuation_tool

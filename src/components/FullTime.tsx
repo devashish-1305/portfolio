@@ -33,6 +33,7 @@ export default function FullTime() {
         <li className={stats.hl.size ? 'done' : undefined}>{fill(c.recap.hl, { n: <b>{stats.hl.size}</b>, total: projects.items.length })}</li>
         <li className={stats.cards.size ? 'done' : undefined}>{fill(c.recap.cards, { n: <b>{stats.cards.size}</b>, total: offTheClock.cards.length })}</li>
         <li className={stats.resume ? 'done' : undefined}>{c.recap.resume}</li>
+        <li className={stats.chat ? 'done' : undefined}>{c.recap.chat}</li>
       </ul>
       <p className="lead">{c.lead}</p>
       <p className="sub">{c.sub}</p>

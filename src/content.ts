@@ -50,6 +50,7 @@ export const pops = {
   race: 'P1',
   emailCopied: 'SIGNED!',
   resume: 'SCOUTED!',
+  chat: 'ASKED!',
   messiOn: 'GOAT',
   messiOff: 'CLASSIC',
 };
@@ -254,6 +255,7 @@ export const fullTime = {
     hl: 'Opened {n} of {total} projects',
     cards: 'Flipped {n} of {total} cards',
     resume: 'Grabbed the resume',
+    chat: 'Asked the bot',
   },
   lead: "You bring the idea. I'll play the pass.",
   sub: 'Open to AI builder, forward deployed engineer and AI solutions roles, where business meets tech. Bengaluru, Gurugram or Mumbai, or remote from anywhere. Available now.',
@@ -262,4 +264,33 @@ export const fullTime = {
   copied: 'Email copied',
   copyFailed: 'Select the address below',
   emailLine: 'Or write to',
+};
+
+/** "Ask me" chat widget. The server (server/chat.ts) also reads maxChars and errors from here. */
+export const chat = {
+  launcher: 'Ask me',
+  launcherAria: 'Ask me about Devashish',
+  title: 'Ask me',
+  subtitle: "AI answers from Devashish's profile. It can make mistakes.",
+  greeting: "Ask me anything about Devashish's work.",
+  suggestions: ['What did he build at Benefi?', 'Is he a fit for an FDE role?', "What's his strongest project?"],
+  suggestionsAria: 'Suggested questions',
+  inputLabel: 'Your question',
+  placeholder: 'Ask a question',
+  send: 'Send',
+  close: 'Close chat',
+  thinking: 'Thinking',
+  maxChars: 500,
+  charsLeft: '{n} characters left', // shown near the limit
+  errors: {
+    tooLong: 'That message is a bit long. Keep it under 500 characters and try again.',
+    rateLimited: "You've asked a lot in a short time. Take a breather and try again in a few minutes, or email Devashish at devashish.dwivedi.13@gmail.com.",
+    busy: 'The assistant is getting a lot of questions right now. Give it a minute and try again.',
+    down: "The assistant is offline at the moment. You can reach Devashish directly at devashish.dwivedi.13@gmail.com.",
+    forbidden: "This assistant only answers questions asked on Devashish's site.",
+    badRequest: "Something about that message didn't come through right. Try again.",
+    network: "Couldn't reach the assistant. Check your connection and try again.",
+    empty: 'No answer came back. Try asking again.',
+    cutOff: '(The answer got cut off. Try asking again.)',
+  },
 };

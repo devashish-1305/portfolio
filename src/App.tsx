@@ -12,6 +12,7 @@ import Research from './components/Research';
 import HowIPlay from './components/HowIPlay';
 import OffTheClock from './components/OffTheClock';
 import FullTime from './components/FullTime';
+import ChatWidget from './components/ChatWidget';
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ function Page() {
         <FullTime />
       </main>
       <footer>{site.footer}</footer>
+      <ChatWidget />
     </>
   );
 }
