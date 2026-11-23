@@ -3,6 +3,7 @@ import { reduce, centerOf } from '../fx';
 import { useGame } from '../game';
 import { offTheClock as c, type CardId, type HobbyCard } from '../content';
 import { Rich } from '../rich';
+import EggHint from './EggHint';
 
 // Scene background class per card.
 const SCENE: Record<CardId, string> = { football: 'sc-foot', f1: 'sc-f1', tennis: 'sc-tennis', running: 'sc-run', music: 'sc-music', story: 'sc-story' };
@@ -129,6 +130,7 @@ export default function OffTheClock() {
           />
         ))}
       </div>
+      <EggHint />
     </section>
   );
 }

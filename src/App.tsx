@@ -14,6 +14,7 @@ import HowIPlay from './components/HowIPlay';
 import OffTheClock from './components/OffTheClock';
 import FullTime from './components/FullTime';
 import ChatWidget from './components/ChatWidget';
+import EggHint from './components/EggHint';
 
 // Vercel Analytics: cookieless page views only (no custom events). Skipped locally, where Vercel's script isn't served.
 const onVercelHost = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
@@ -46,7 +47,7 @@ function Page() {
         <OffTheClock />
         <FullTime />
       </main>
-      <footer>{site.footer}</footer>
+      <footer>{site.footer}<EggHint className="foot" /></footer>
       <ChatWidget />
       {onVercelHost && <Analytics />}
     </>

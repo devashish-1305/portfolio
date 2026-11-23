@@ -23,6 +23,7 @@ export default function Hero() {
   const { first, pop } = useGame();
   const [lit, setLit] = useState(0);
   const [cap, setCap] = useState(0);
+  const [pressed, setPressed] = useState(false); // "Play the pass" pulses until its first click
   const board = useRef<SVGSVGElement>(null);
   const route = useRef<SVGPathElement>(null);
   const ball = useRef<SVGUseElement>(null);
@@ -70,9 +71,9 @@ export default function Hero() {
     };
     playRef.current = playPass;
 
+    // No autoplay: the ball rests on "Your idea" (step 1) until the visitor presses "Play the pass".
     setBall(STEPS[0].x, STEPS[0].y);
     if (!reduce) {
-      later(() => playPass(false), 700);
       const r = route.current!, L = r.getTotalLength();
       r.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: 1200, easing: 'ease-out' });
     }
@@ -122,7 +123,7 @@ export default function Hero() {
         <div className="caption" aria-live="polite">
           <span className="step">{cap + 1}/{STEPS.length}</span>
           <div><b className="cap-t">{STEPS[cap].t}</b><p>{STEPS[cap].d}</p></div>
-          <button className="replay" onClick={() => playRef.current(true)}>{hero.pass.replay}</button>
+          <button className={`replay${!pressed && !reduce ? ' pulse' : ''}`} onClick={() => { setPressed(true); playRef.current(true); }}>{hero.pass.replay}</button>
         </div>
       </div>
     </section>

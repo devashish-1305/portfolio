@@ -54,6 +54,13 @@ export const header = {
   },
 };
 
+/** Easter egg hint, shown only on devices with a fine pointer that can hover (desktop with keyboard).
+    {messi} and {max} render as keyboard keys; the words themselves are the codes to type. */
+export const easterEggHint = {
+  text: 'Psst. Type {messi} or {max} anywhere on this page.',
+  keys: { messi: 'messi', max: 'max' },
+};
+
 /** Pop-up words for interactions outside the hobby cards. */
 export const pops = {
   pass: 'GOAL!',
