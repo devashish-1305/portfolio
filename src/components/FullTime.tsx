@@ -3,6 +3,7 @@ import { fullTime as c, header, offTheClock, pops, projects, site } from '../con
 import { centerOf } from '../fx';
 import { useGame } from '../game';
 import { fill } from '../rich';
+import ResumeButton from './ResumeButton';
 
 /** Final score, a recap of what the visitor did, and contact. */
 export default function FullTime() {
@@ -31,6 +32,7 @@ export default function FullTime() {
         <li className={stats.race ? 'done' : undefined}>{c.recap.race}</li>
         <li className={stats.hl.size ? 'done' : undefined}>{fill(c.recap.hl, { n: <b>{stats.hl.size}</b>, total: projects.items.length })}</li>
         <li className={stats.cards.size ? 'done' : undefined}>{fill(c.recap.cards, { n: <b>{stats.cards.size}</b>, total: offTheClock.cards.length })}</li>
+        <li className={stats.resume ? 'done' : undefined}>{c.recap.resume}</li>
       </ul>
       <p className="lead">{c.lead}</p>
       <p className="sub">{c.sub}</p>
@@ -38,6 +40,7 @@ export default function FullTime() {
         <button className="btn red" onClick={copy}>{copyLabel}</button>
         <a className="btn" href={site.links.linkedin.href}>{site.links.linkedin.label}</a>
         <a className="btn" href={site.links.github.href}>{site.links.github.label}</a>
+        <ResumeButton label={c.resume} />
       </div>
       <p className="email-line">{c.emailLine} <span>{site.email}</span></p>
     </section>

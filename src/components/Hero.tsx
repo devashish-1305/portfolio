@@ -3,6 +3,7 @@ import { burst, reduce } from '../fx';
 import { useGame } from '../game';
 import { hero, pops } from '../content';
 import { Rich } from '../rich';
+import ResumeButton from './ResumeButton';
 
 const STEPS = hero.pass.steps;
 const LAST = STEPS.length - 1;
@@ -88,7 +89,7 @@ export default function Hero() {
         <div className="facts">
           {hero.facts.map(f => <div key={f.label}>{f.value}<span>{f.label}</span></div>)}
         </div>
-        <div className="cta"><a className="btn solid" href={hero.cta.primary.href}>{hero.cta.primary.label}</a><a className="btn" href={hero.cta.secondary.href}>{hero.cta.secondary.label}</a></div>
+        <div className="cta"><a className="btn solid" href={hero.cta.primary.href}>{hero.cta.primary.label}</a><a className="btn" href={hero.cta.secondary.href}>{hero.cta.secondary.label}</a><ResumeButton label={hero.cta.resume} /></div>
       </div>
 
       <div className="tele">

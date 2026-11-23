@@ -15,6 +15,8 @@ export const site = {
     linkedin: { label: 'LinkedIn', href: 'https://linkedin.com/in/devashish-dwivedi' },
     github: { label: 'GitHub', href: 'https://github.com/devashish-1305' },
   },
+  // The PDF lives in public/. filename is what it saves as.
+  resume: { href: '/resume.pdf', filename: 'Devashish_Dwivedi_Resume.pdf' },
   footer: 'Built by Devashish Dwivedi. Every number on this page is from my own work.',
 };
 
@@ -47,6 +49,7 @@ export const pops = {
   project: 'GOAL!',
   race: 'P1',
   emailCopied: 'SIGNED!',
+  resume: 'SCOUTED!',
   messiOn: 'GOAT',
   messiOff: 'CLASSIC',
 };
@@ -63,6 +66,7 @@ export const hero = {
   cta: {
     primary: { label: 'See the projects', href: '#highlights' },
     secondary: { label: 'Get in touch', href: '#fulltime' },
+    resume: 'Download resume',
   },
   pass: {
     aria: 'How I work, as a pass from your idea to a shipped goal',
@@ -249,10 +253,12 @@ export const fullTime = {
     race: 'Started the race',
     hl: 'Opened {n} of {total} projects',
     cards: 'Flipped {n} of {total} cards',
+    resume: 'Grabbed the resume',
   },
   lead: "You bring the idea. I'll play the pass.",
   sub: 'Open to AI builder, forward deployed engineer and AI solutions roles, where business meets tech. Bengaluru, Gurugram or Mumbai, or remote from anywhere. Available now.',
   copyEmail: 'Copy my email',
+  resume: 'Download resume',
   copied: 'Email copied',
   copyFailed: 'Select the address below',
   emailLine: 'Or write to',
