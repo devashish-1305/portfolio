@@ -1,5 +1,6 @@
 // Build-time generation, run automatically on `npm run dev` and `npm run build`:
 //  - server/profile.generated.ts: content/profile.md as a string, so the chat function has it with no runtime file reads.
+//  - public/llms.txt: profile.md without its "Rules for the assistant" section, for AI crawlers (served at /llms.txt).
 //  - src/link-allowlist.generated.ts: every URL and email in profile.md and content.ts. Bot replies may only link to these
 //    (see src/links.ts).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -24,9 +25,15 @@ export function extractLinks(text) {
   return { emails, urls };
 }
 
+/** profile.md minus the "## Rules for the assistant" section (those are instructions for the chatbot, not facts). */
+export function toLlmsTxt(profile) {
+  return profile.replace(/^## Rules for the assistant\n[\s\S]*?(?=^## )/m, '').replace(/\n{3,}/g, '\n\n');
+}
+
 export function genProfile() {
   const profile = readFileSync(root + 'content/profile.md', 'utf8');
   writeIfChanged(root + 'server/profile.generated.ts', `${HEADER}export const PROFILE = ${JSON.stringify(profile)};\n`);
+  writeIfChanged(root + 'public/llms.txt', toLlmsTxt(profile));
 
   const content = readFileSync(root + 'src/content.ts', 'utf8');
   const a = extractLinks(profile), b = extractLinks(content);

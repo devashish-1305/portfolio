@@ -20,10 +20,21 @@ export const site = {
   footer: 'Built by Devashish Dwivedi. Every number on this page is from my own work.',
 };
 
+/** Search and sharing. The site URL itself comes from the SITE_URL env var at build time (see vite.config.ts). */
+export const seo = {
+  title: 'Devashish Dwivedi | AI Builder',
+  description: 'AI builder in Gurugram. I turn what people mean into AI systems that ship: production ML, LLM evals, RAG and agents. Available now.',
+  defaultSiteUrl: 'https://devashish.vercel.app',
+  ogImage: '/og-image.png',
+  ogImageAlt: 'Devashish Dwivedi, AI builder. I play the pass between the idea and the goal.',
+  themeColor: '#0A0F19',
+  person: { jobTitle: 'AI Engineer', locality: 'Gurugram', country: 'India' },
+};
+
 export const header = {
   crestNumber: '8',
   crestName: 'Devashish',
-  crestAria: 'Back to the top',
+  crestAria: 'Devashish, back to the top',
   navAria: 'Sections',
   nav: [
     { label: 'Career', href: '#career' },
@@ -89,7 +100,7 @@ export const career = {
   intro: "From a legal NLP internship in 2023 to owning **three production ML and LLM systems** at Benefi Global. I race to win and I don't lift off. Start the race to run through it.",
   go: 'Lights out',
   orClick: 'Or click the car.',
-  carAria: 'Launch the car',
+  carAria: 'Launch the car, number {n}', // {n} = carNumber (the number painted on the car)
   carNumber: '23',
   // gate: label on the track gate. detail: **bold** renders as <b>. Keep 6 laps (they map to the 6 track gates).
   laps: [
@@ -223,7 +234,7 @@ export const howIPlay = {
 /** id picks the illustration and mini animation in OffTheClock.tsx. */
 export type CardId = 'football' | 'f1' | 'tennis' | 'running' | 'music' | 'story';
 export type HobbyCard = {
-  id: CardId; cursor: CursorKind; aria: string; title: string; blurb: string;
+  id: CardId; cursor: CursorKind; title: string; blurb: string;
   back: string; link: Link; pop: string; popStyle?: 'p1';
 };
 
@@ -233,16 +244,16 @@ export const offTheClock = {
   flipHint: 'Flip',
   backTitle: 'At work',
   flipBack: 'Flip back',
-  ariaSuffix: '. Flip to see how it shows up at work',
+  flipCard: 'Flip card', // ends each card's accessible name: "<title>. <blurb> Flip card"
   art: { jerseyName: 'DEVASHISH', jerseyNumber: '8', driverNumber: '23', vinylLabel: ['ON', 'REPEAT'] },
   storyLines: ['Once there was a messy spreadsheet', 'Someone asked the right questions', 'It became a system that ships'],
   cards: [
-    { id: 'football', cursor: 'ball', aria: 'Football', title: 'Football', blurb: 'Barça, and Messi above everyone. I play attacking midfield.', back: "I'm the passer. An assist counts as much as a goal, so I make the people around me look good.", link: { label: 'See how I play', href: '#how' }, pop: 'GOAL!' },
-    { id: 'f1', cursor: 'f1', aria: 'Formula 1', title: 'Formula 1', blurb: "Max's mentality: no lifting off, no settling for second.", back: "F1 runs on telemetry, and so do I. It's why I wrote a quant research paper for fun.", link: { label: 'See the research', href: '#research' }, pop: 'P1', popStyle: 'p1' },
-    { id: 'tennis', cursor: 'tennis', aria: 'Tennis', title: 'Tennis', blurb: 'One on one, nowhere to hide.', back: 'I own the whole point, from the first client call to the dashboard watching the model in production.', link: { label: 'See the career', href: '#career' }, pop: 'ACE!' },
-    { id: 'running', cursor: 'run', aria: 'Running', title: 'Running', blurb: 'Steady miles over sprints.', back: "Pace beats panic. repo2bench shipped 10 tasks I could prove, not 100 I couldn't.", link: { label: 'See the projects', href: '#highlights' }, pop: 'PB!' },
-    { id: 'music', cursor: 'mic', aria: 'R&B and hip-hop', title: 'R&B and hip-hop', blurb: 'Zayn, Chris Brown, The Weeknd, Travis Scott, Don Toliver. And yes, I sing.', back: 'A good song tells a whole story in three minutes. I explain systems the same way, to a CFO, a PM or an engineer.', link: { label: 'Hear it in the projects', href: '#highlights' }, pop: 'ENCORE!' },
-    { id: 'story', cursor: 'story', aria: 'Storytelling and people', title: 'Stories and people', blurb: 'A lifelong people-watcher. Apparently the life of the party.', back: 'Requirements are mostly listening. Demos are mostly storytelling. Both are the pass.', link: { label: 'Watch the pass', href: '#top' }, pop: 'PLOT TWIST!' },
+    { id: 'football', cursor: 'ball', title: 'Football', blurb: 'Barça, and Messi above everyone. I play attacking midfield.', back: "I'm the passer. An assist counts as much as a goal, so I make the people around me look good.", link: { label: 'See how I play', href: '#how' }, pop: 'GOAL!' },
+    { id: 'f1', cursor: 'f1', title: 'Formula 1', blurb: "Max's mentality: no lifting off, no settling for second.", back: "F1 runs on telemetry, and so do I. It's why I wrote a quant research paper for fun.", link: { label: 'See the research', href: '#research' }, pop: 'P1', popStyle: 'p1' },
+    { id: 'tennis', cursor: 'tennis', title: 'Tennis', blurb: 'One on one, nowhere to hide.', back: 'I own the whole point, from the first client call to the dashboard watching the model in production.', link: { label: 'See the career', href: '#career' }, pop: 'ACE!' },
+    { id: 'running', cursor: 'run', title: 'Running', blurb: 'Steady miles over sprints.', back: "Pace beats panic. repo2bench shipped 10 tasks I could prove, not 100 I couldn't.", link: { label: 'See the projects', href: '#highlights' }, pop: 'PB!' },
+    { id: 'music', cursor: 'mic', title: 'R&B and hip-hop', blurb: 'Zayn, Chris Brown, The Weeknd, Travis Scott, Don Toliver. And yes, I sing.', back: 'A good song tells a whole story in three minutes. I explain systems the same way, to a CFO, a PM or an engineer.', link: { label: 'Hear it in the projects', href: '#highlights' }, pop: 'ENCORE!' },
+    { id: 'story', cursor: 'story', title: 'Stories and people', blurb: 'A lifelong people-watcher. Apparently the life of the party.', back: 'Requirements are mostly listening. Demos are mostly storytelling. Both are the pass.', link: { label: 'Watch the pass', href: '#top' }, pop: 'PLOT TWIST!' },
   ] as HobbyCard[],
 };
 

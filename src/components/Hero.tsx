@@ -121,7 +121,7 @@ export default function Hero() {
         </svg>
         <div className="caption" aria-live="polite">
           <span className="step">{cap + 1}/{STEPS.length}</span>
-          <div><h4>{STEPS[cap].t}</h4><p>{STEPS[cap].d}</p></div>
+          <div><b className="cap-t">{STEPS[cap].t}</b><p>{STEPS[cap].d}</p></div>
           <button className="replay" onClick={() => playRef.current(true)}>{hero.pass.replay}</button>
         </div>
       </div>

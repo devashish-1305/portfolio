@@ -94,7 +94,7 @@ export default function Career() {
         {GATES.map((g, i) => (
           <div key={i} className={`gate${i < passed ? ' passed' : ''}`} style={{ left: g.left }} ref={el => { gateRefs.current[i] = el; }}><b>{g.label}</b></div>
         ))}
-        <button className="car" ref={car} aria-label={c.carAria} onClick={() => { if (!racingRef.current) { setPassed(0); drive(); } }}>
+        <button className="car" ref={car} aria-label={c.carAria.replace('{n}', c.carNumber)} onClick={() => { if (!racingRef.current) { setPassed(0); drive(); } }}>
           <svg viewBox="0 0 240 72" aria-hidden="true">
             <rect x="4" y="10" width="32" height="7" rx="1.5" fill="#13306E" /><rect x="8" y="10" width="6" height="30" fill="#0d2152" />
             <path d="M12 50 L12 38 Q36 31 66 29 L92 23 Q108 17 124 25 L150 32 Q190 37 226 45 L230 50 Z" fill="#13306E" />
@@ -112,7 +112,7 @@ export default function Career() {
       <div className="laps">
         {c.laps.map((l, i) => (
           <div key={i} className={`lap${l.now ? ' now' : ''}${i < passed ? ' passed' : ''}`}>
-            <div className="yr">{l.yr}</div><h4>{l.co}</h4><div className="role">{l.role}</div><div className="num"><Rich text={l.detail} bold="b" /></div>
+            <div className="yr">{l.yr}</div><h3>{l.co}</h3><div className="role">{l.role}</div><div className="num"><Rich text={l.detail} bold="b" /></div>
           </div>
         ))}
       </div>

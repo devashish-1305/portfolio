@@ -3,6 +3,7 @@
 
 import { PROFILE } from './profile.generated.js';
 import { chat } from '../src/content.js';
+import { resolveSiteUrl } from '../src/siteUrl.js';
 
 export const LIMITS = {
   maxChars: chat.maxChars,     // per user message
@@ -40,18 +41,32 @@ function rateLimit(ip: string, now = Date.now()): { ok: true } | { ok: false; re
 function refund(ip: string) { hits.get(ip)?.pop(); }
 
 /* ---------- origin check: only the site itself may call this ---------- */
-function originAllowed(req: Request, env: Env): boolean {
-  const origin = req.headers.get('origin');
-  if (!origin) return false;
+/** Origins allowed to call /api/chat: SITE_URL, the Vercel deployment / branch / production domains,
+    any extras in ALLOWED_ORIGINS (comma-separated), and localhost only when running locally. */
+export function allowedOrigins(env: Env): Set<string> {
+  const out = new Set<string>();
+  const add = (v: string | undefined, scheme = 'https://') => {
+    if (!v?.trim()) return;
+    try { out.add(new URL(/^https?:\/\//i.test(v.trim()) ? v.trim() : scheme + v.trim()).origin); } catch { /* ignore malformed */ }
+  };
+  add(resolveSiteUrl(env));
+  add(env.VERCEL_URL);                    // this deployment, e.g. portfolio-abc123-deva.vercel.app (previews too)
+  add(env.VERCEL_BRANCH_URL);             // branch alias for preview deployments
+  add(env.VERCEL_PROJECT_PRODUCTION_URL); // the production domain
+  for (const o of (env.ALLOWED_ORIGINS ?? '').split(',')) add(o);
+  return out;
+}
+
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+
+export function originAllowed(origin: string | null, env: Env, { dev = false } = {}): boolean {
+  if (!origin || origin === 'null') return false;
   let o: URL;
   try { o = new URL(origin); } catch { return false; }
-  // Same origin as the host serving the request (localhost in dev, the Vercel or custom domain in production)...
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
-  if (host && o.host === host) return true;
-  // ...or an explicitly allowed origin.
-  const allowed = new Set((env.ALLOWED_ORIGINS ?? '').split(',').map(s => s.trim()).filter(Boolean));
-  for (const v of [env.VERCEL_URL, env.VERCEL_BRANCH_URL, env.VERCEL_PROJECT_PRODUCTION_URL]) if (v) allowed.add(`https://${v}`);
-  return allowed.has(o.origin);
+  // "dev" is decided by the server (the Vite dev middleware or `vercel dev`), never by anything in the request.
+  const local = dev || env.VERCEL_ENV === 'development';
+  if (local && LOCAL_HOSTS.has(o.hostname) && (o.protocol === 'http:' || o.protocol === 'https:')) return true;
+  return allowedOrigins(env).has(o.origin);
 }
 
 /* ---------- request validation ---------- */
@@ -84,9 +99,9 @@ const json = (status: number, error: string, extra: Record<string, string> = {})
   });
 
 /* ---------- handler ---------- */
-export async function handleChat(req: Request, { env, ip }: { env: Env; ip: string }): Promise<Response> {
+export async function handleChat(req: Request, { env, ip, dev = false }: { env: Env; ip: string; dev?: boolean }): Promise<Response> {
   if (req.method !== 'POST') return json(405, chat.errors.badRequest, { Allow: 'POST' });
-  if (!originAllowed(req, env)) return json(403, chat.errors.forbidden);
+  if (!originAllowed(req.headers.get('origin'), env, { dev })) return json(403, chat.errors.forbidden);
 
   const parsed = await parse(req);
   if (!parsed.ok) return json(parsed.status, parsed.error);

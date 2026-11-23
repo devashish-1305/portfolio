@@ -33,9 +33,9 @@ export default function Projects() {
             </button>
             <div className="hl-detail"><div>
               <div className="ipg">
-                <div><h5><i></i>{c.labels.idea}</h5><p><Rich text={p.idea} /></p></div>
-                <div><h5><i></i>{c.labels.pass}</h5><p><Rich text={p.pass} /></p></div>
-                <div><h5><i></i>{c.labels.goal}</h5><p><Rich text={p.goal} /></p></div>
+                <div><h4><i></i>{c.labels.idea}</h4><p><Rich text={p.idea} /></p></div>
+                <div><h4><i></i>{c.labels.pass}</h4><p><Rich text={p.pass} /></p></div>
+                <div><h4><i></i>{c.labels.goal}</h4><p><Rich text={p.goal} /></p></div>
               </div>
               {p.links && (
                 <div className="hl-links">

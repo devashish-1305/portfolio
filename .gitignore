@@ -7,3 +7,6 @@ dist
 *.log
 .DS_Store
 *.tsbuildinfo
+
+# generated from content/profile.md on every dev/build/test run
+public/llms.txt

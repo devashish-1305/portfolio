@@ -156,10 +156,13 @@ function FlipCard({ card, art, onEnter, onLeave, onPlay, onFlipped, later }: {
   return (
     <div className="icard" ref={root} onMouseEnter={onEnter} onMouseLeave={onLeave}>
       <div className="icard-in">
-        <button className="face front" ref={front} aria-label={card.aria + c.ariaSuffix} onClick={flip}>
+        {/* The accessible name contains all visible text (title, blurb, "Flip"). The spaces and the hint's position
+            after the text keep it matching for checkers that read the text straight through; the hint is
+            absolutely positioned, so the order doesn't change the layout. */}
+        <button className="face front" ref={front} aria-label={`${card.title}. ${card.blurb} ${c.flipCard}`} onClick={flip}>
           <span className={`scene ${SCENE[card.id]}`}>{art}</span>
+          <span className="txt"><h3>{card.title}</h3>{' '}<p>{card.blurb}</p></span>{' '}
           <span className="flip-hint">{c.flipHint}</span>
-          <span className="txt"><h3>{card.title}</h3><p>{card.blurb}</p></span>
         </button>
         <div className="face back">
           <div><h4>{c.backTitle}</h4><p>{card.back}</p></div>

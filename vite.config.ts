@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import type { IncomingMessage } from 'node:http';
 // @ts-expect-error plain JS build script
 import { genProfile } from './scripts/gen-profile.mjs';
+import { seoPlugin } from './scripts/seo-plugin';
 
 /** Keeps server/profile.generated.ts in sync with content/profile.md, and serves /api/chat under `npm run dev`
     with the same handler Vercel runs in production. The key is read from .env.local on the server side only. */
@@ -23,7 +24,7 @@ function chatApi(): Plugin {
           for (const [k, v] of Object.entries(req.headers)) if (v !== undefined) headers.set(k, Array.isArray(v) ? v.join(', ') : v);
           const body = req.method === 'POST' || req.method === 'PUT' ? await readBody(req) : undefined;
           const request = new Request(`http://${req.headers.host}${req.originalUrl ?? '/api/chat'}`, { method: req.method, headers, body });
-          const response: Response = await handleChat(request, { env, ip: req.socket.remoteAddress ?? 'dev' });
+          const response: Response = await handleChat(request, { env, ip: req.socket.remoteAddress ?? 'dev', dev: true });
           res.statusCode = response.status;
           response.headers.forEach((v, k) => res.setHeader(k, v));
           if (response.body) for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) res.write(chunk);
@@ -49,6 +50,9 @@ function readBody(req: IncomingMessage): Promise<string> {
   });
 }
 
-export default defineConfig({
-  plugins: [react(), chatApi()],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), ''); // SITE_URL for canonical / og:url / sitemap (server-side only)
+  return {
+    plugins: [react(), chatApi(), seoPlugin(() => env)],
+  };
 });

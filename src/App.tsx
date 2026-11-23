@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { attachCanvas, reduce } from './fx';
 import { pops, site } from './content';
 import { GameProvider, useGame } from './game';
@@ -13,6 +14,9 @@ import HowIPlay from './components/HowIPlay';
 import OffTheClock from './components/OffTheClock';
 import FullTime from './components/FullTime';
 import ChatWidget from './components/ChatWidget';
+
+// Vercel Analytics: cookieless page views only (no custom events). Skipped locally, where Vercel's script isn't served.
+const onVercelHost = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
 export default function App() {
   return (
@@ -44,6 +48,7 @@ function Page() {
       </main>
       <footer>{site.footer}</footer>
       <ChatWidget />
+      {onVercelHost && <Analytics />}
     </>
   );
 }

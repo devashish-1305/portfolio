@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- iOS home-screen icon: the crest on the site's night background (iOS rounds the corners itself). -->
+  <rect width="180" height="180" fill="#0A0F19"/>
+  <image href="../public/favicon.svg" x="22" y="22" width="136" height="136"/>
+</svg>
