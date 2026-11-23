@@ -24,7 +24,7 @@ export const site = {
 export const seo = {
   title: 'Devashish Dwivedi | AI Builder',
   description: 'AI builder in Gurugram. I turn what people mean into AI systems that ship: production ML, LLM evals, RAG and agents. Available now.',
-  defaultSiteUrl: 'https://devashish.vercel.app',
+  defaultSiteUrl: 'https://devashish-dwivedi.vercel.app',
   ogImage: '/og-image.png',
   ogImageAlt: 'Devashish Dwivedi, AI builder. I play the pass between the idea and the goal.',
   themeColor: '#0A0F19',

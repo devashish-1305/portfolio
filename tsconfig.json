@@ -1,11 +1,8 @@
 {
+  // Frontend (browser code in src/). The API has its own configs in api/ and server/.
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -13,17 +10,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "types": [
-      "vite/client",
-      "node"
-    ]
+    "types": ["vite/client"]
   },
-  "include": [
-    "src",
-    "server",
-    "api",
-    "vite.config.ts"
-  ]
+  "include": ["src"]
 }

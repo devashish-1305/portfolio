@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { allowedOrigins, handleChat, originAllowed } from './chat';
-import { chat } from '../src/content';
+import { allowedOrigins, handleChat, originAllowed } from './chat.js';
+import { CHAT } from './content.generated.js';
 
 const ORIGIN = 'http://localhost:5174';
 let n = 0;
@@ -47,7 +47,7 @@ describe('model fallback', () => {
     const calls = groq({ 'openai/gpt-oss-120b': () => status(429), 'openai/gpt-oss-20b': () => status(429) });
     const r = await call();
     expect(r.status).toBe(503);
-    expect(await r.json()).toEqual({ error: chat.errors.busy });
+    expect(await r.json()).toEqual({ error: CHAT.errors.busy });
     expect(r.headers.get('retry-after')).toBe('7');
     expect(calls.length).toBe(2);
   });
@@ -57,7 +57,7 @@ describe('model fallback', () => {
     const r = await call();
     const body = await r.text();
     expect(r.status).toBe(502);
-    expect(body).toBe(JSON.stringify({ error: chat.errors.down }));
+    expect(body).toBe(JSON.stringify({ error: CHAT.errors.down }));
     expect(body).not.toContain('org_');
   });
 
@@ -80,7 +80,7 @@ describe('model fallback', () => {
       return new Response(new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"He built"}}]}\n\n')); setTimeout(() => c.error(new Error('reset')), 5); } }), { status: 200 });
     }));
     const r = await call();
-    expect(await r.text()).toBe('He built\n\n' + chat.errors.cutOff);
+    expect(await r.text()).toBe('He built\n\n' + CHAT.errors.cutOff);
     expect(calls).toEqual(['openai/gpt-oss-120b']);
   });
 });
@@ -92,29 +92,29 @@ describe('origin allowlist', () => {
     VERCEL_ENV: 'preview',
     VERCEL_URL: 'devashish-portfolio-abc123-deva.vercel.app',
     VERCEL_BRANCH_URL: 'devashish-portfolio-git-main-deva.vercel.app',
-    VERCEL_PROJECT_PRODUCTION_URL: 'devashish.vercel.app',
+    VERCEL_PROJECT_PRODUCTION_URL: 'devashish-dwivedi.vercel.app',
   };
 
   it('allows SITE_URL and the Vercel preview, branch and production domains', () => {
-    for (const o of ['https://devashish.dev', 'https://devashish-portfolio-abc123-deva.vercel.app', 'https://devashish-portfolio-git-main-deva.vercel.app', 'https://devashish.vercel.app'])
+    for (const o of ['https://devashish.dev', 'https://devashish-portfolio-abc123-deva.vercel.app', 'https://devashish-portfolio-git-main-deva.vercel.app', 'https://devashish-dwivedi.vercel.app'])
       expect(originAllowed(o, vercel), o).toBe(true);
     expect([...allowedOrigins(vercel)].sort()).toEqual([
+      'https://devashish-dwivedi.vercel.app',
       'https://devashish-portfolio-abc123-deva.vercel.app',
       'https://devashish-portfolio-git-main-deva.vercel.app',
       'https://devashish.dev',
-      'https://devashish.vercel.app',
     ]);
   });
 
   it('rejects everything else in production, including localhost and look-alikes', () => {
     for (const o of ['http://localhost:5173', 'http://127.0.0.1:4173', 'https://evil.example', 'https://devashish.dev.evil.example',
-      'https://evil-devashish.vercel.app', 'http://devashish.dev', 'https://devashish.dev:8443', 'null', '', 'not a url'])
+      'https://evil-devashish-dwivedi.vercel.app', 'http://devashish.dev', 'https://devashish.dev:8443', 'null', '', 'not a url'])
       expect(originAllowed(o, { ...vercel, VERCEL_ENV: 'production' }), o).toBe(false);
     expect(originAllowed(null, vercel)).toBe(false);
   });
 
   it('falls back to the default site URL when SITE_URL is unset', () => {
-    expect(originAllowed('https://devashish.vercel.app', {})).toBe(true);
+    expect(originAllowed('https://devashish-dwivedi.vercel.app', {})).toBe(true);
     expect(originAllowed('https://devashish.dev', {})).toBe(false);
   });
 
@@ -137,13 +137,13 @@ describe('origin allowlist', () => {
       body: JSON.stringify({ messages: [{ role: 'user', content: 'hi' }] }),
     }), { env: { ...vercel, GROQ_API_KEY: 'k' }, ip: 'origin-test' });
     expect(r.status).toBe(403);
-    expect(await r.json()).toEqual({ error: chat.errors.forbidden });
+    expect(await r.json()).toEqual({ error: CHAT.errors.forbidden });
   });
 
   it('handleChat accepts the production domain', async () => {
     groq({ 'openai/gpt-oss-120b': () => sse('ok') });
-    const r = await handleChat(new Request('https://devashish.vercel.app/api/chat', {
-      method: 'POST', headers: { Origin: 'https://devashish.vercel.app', 'Content-Type': 'application/json' },
+    const r = await handleChat(new Request('https://devashish-dwivedi.vercel.app/api/chat', {
+      method: 'POST', headers: { Origin: 'https://devashish-dwivedi.vercel.app', 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [{ role: 'user', content: 'hi' }] }),
     }), { env: { ...vercel, GROQ_API_KEY: 'k' }, ip: 'origin-test-2' });
     expect([r.status, await r.text()]).toEqual([200, 'ok']);

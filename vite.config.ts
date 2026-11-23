@@ -3,18 +3,20 @@ import react from '@vitejs/plugin-react';
 import type { IncomingMessage } from 'node:http';
 // @ts-expect-error plain JS build script
 import { genProfile } from './scripts/gen-profile.mjs';
-import { seoPlugin } from './scripts/seo-plugin';
+import { seoPlugin } from './scripts/seo-plugin.ts';
 
 /** Keeps server/profile.generated.ts in sync with content/profile.md, and serves /api/chat under `npm run dev`
     with the same handler Vercel runs in production. The key is read from .env.local on the server side only. */
 function chatApi(): Plugin {
   return {
     name: 'chat-api',
-    buildStart() { genProfile(); },
-    configureServer(server) {
-      genProfile();
+    async buildStart() { await genProfile(); },
+    async configureServer(server) {
+      await genProfile();
       server.watcher.add('content/profile.md');
-      server.watcher.on('change', f => { if (f.endsWith('content/profile.md')) genProfile(); });
+      server.watcher.on('change', f => {
+        if (f.endsWith('content/profile.md') || f.endsWith('src/content.ts')) genProfile().catch((e: unknown) => server.config.logger.error(String(e)));
+      });
 
       const env = loadEnv(server.config.mode, process.cwd(), ''); // not exposed to the client (no VITE_ prefix)
       server.middlewares.use('/api/chat', async (req, res) => {

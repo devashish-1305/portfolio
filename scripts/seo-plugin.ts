@@ -1,8 +1,8 @@
 /* Head tags (title, description, canonical, Open Graph, Twitter, JSON-LD) plus robots.txt and sitemap.xml,
    all built from src/content.ts and the SITE_URL env var, so the domain can change without code changes. */
 import type { HtmlTagDescriptor, Plugin } from 'vite';
-import { seo, site } from '../src/content';
-import { resolveSiteUrl } from '../src/siteUrl';
+import { seo, site } from '../src/content.ts';
+import { resolveSiteUrl } from '../src/siteUrl.ts';
 
 
 export function headTags(siteUrl: string): HtmlTagDescriptor[] {

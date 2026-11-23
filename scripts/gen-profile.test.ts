@@ -9,8 +9,8 @@ describe('llms.txt', () => {
     expect(toLlmsTxt(md)).toBe('# Title\n\n## At a glance\n- Name: X\n\n## Skills\n- Python\n');
   });
 
-  it('public/llms.txt matches content/profile.md minus the rules', () => {
-    genProfile();
+  it('public/llms.txt matches content/profile.md minus the rules', async () => {
+    await genProfile();
     const profile = readFileSync('content/profile.md', 'utf8');
     const llms = readFileSync('public/llms.txt', 'utf8');
     expect(llms).toBe(toLlmsTxt(profile));

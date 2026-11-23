@@ -1,12 +1,12 @@
 /* Chat handler shared by the Vercel function (api/chat.ts) and the Vite dev middleware (vite.config.ts).
    Web-standard Request in, Response out. The Groq key is read from `env` here and never leaves the server. */
 
-import { PROFILE } from './profile.generated.js';
-import { chat } from '../src/content.js';
-import { resolveSiteUrl } from '../src/siteUrl.js';
+// Only server-local imports, with explicit .js extensions: Vercel runs this as native Node ESM.
+// The content it needs (profile, site URL, chat copy) is generated into ./content.generated.ts at build time.
+import { CHAT, DEFAULT_SITE_URL, PROFILE } from './content.generated.js';
 
 export const LIMITS = {
-  maxChars: chat.maxChars,     // per user message
+  maxChars: CHAT.maxChars,     // per user message
   maxHistory: 6,               // only the last N messages go to the model
   maxAssistantChars: 2000,     // cap on prior bot turns the client sends back
   maxBodyBytes: 16_000,
@@ -40,6 +40,14 @@ function rateLimit(ip: string, now = Date.now()): { ok: true } | { ok: false; re
 /** Gives the slot back when the request never got an answer (Groq busy or down), so visitors aren't charged for our outage. */
 function refund(ip: string) { hits.get(ip)?.pop(); }
 
+/** The site's public URL (no trailing slash): SITE_URL, or the default from src/content.ts. */
+export function resolveSiteUrl(env: Env): string {
+  return (env.SITE_URL || DEFAULT_SITE_URL).trim().replace(/\/+$/, '');
+}
+
+/** Failure log line: reason only. Never the key, the user's messages or other request content. */
+function logFail(reason: string) { console.error(`[chat] ${reason}`); }
+
 /* ---------- origin check: only the site itself may call this ---------- */
 /** Origins allowed to call /api/chat: SITE_URL, the Vercel deployment / branch / production domains,
     any extras in ALLOWED_ORIGINS (comma-separated), and localhost only when running locally. */
@@ -72,9 +80,9 @@ export function originAllowed(origin: string | null, env: Env, { dev = false } =
 /* ---------- request validation ---------- */
 type Parsed = { ok: true; messages: Msg[] } | { ok: false; status: number; error: string };
 async function parse(req: Request): Promise<Parsed> {
-  const bad = { ok: false as const, status: 400, error: chat.errors.badRequest };
+  const bad = { ok: false as const, status: 400, error: CHAT.errors.badRequest };
   const raw = await req.text().catch(() => '');
-  if (raw.length > LIMITS.maxBodyBytes) return { ok: false, status: 413, error: chat.errors.tooLong };
+  if (raw.length > LIMITS.maxBodyBytes) return { ok: false, status: 413, error: CHAT.errors.tooLong };
   let body: unknown;
   try { body = JSON.parse(raw); } catch { return bad; }
   const list = (body as { messages?: unknown })?.messages;
@@ -84,7 +92,7 @@ async function parse(req: Request): Promise<Parsed> {
   for (const m of list.slice(-LIMITS.maxHistory)) {
     const { role, content } = (m ?? {}) as { role?: unknown; content?: unknown };
     if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') return bad;
-    if (role === 'user' && content.length > LIMITS.maxChars) return { ok: false, status: 413, error: chat.errors.tooLong };
+    if (role === 'user' && content.length > LIMITS.maxChars) return { ok: false, status: 413, error: CHAT.errors.tooLong };
     messages.push({ role, content: role === 'assistant' ? content.slice(0, LIMITS.maxAssistantChars) : content });
   }
   const last = messages[messages.length - 1];
@@ -99,18 +107,31 @@ const json = (status: number, error: string, extra: Record<string, string> = {})
   });
 
 /* ---------- handler ---------- */
-export async function handleChat(req: Request, { env, ip, dev = false }: { env: Env; ip: string; dev?: boolean }): Promise<Response> {
-  if (req.method !== 'POST') return json(405, chat.errors.badRequest, { Allow: 'POST' });
-  if (!originAllowed(req.headers.get('origin'), env, { dev })) return json(403, chat.errors.forbidden);
+export async function handleChat(req: Request, opts: { env: Env; ip: string; dev?: boolean }): Promise<Response> {
+  try {
+    return await handle(req, opts);
+  } catch (e) {
+    const err = e as { name?: string; code?: string };
+    logFail(`unexpected ${err.name ?? 'error'}${err.code ? ` (${err.code})` : ''}`);
+    return json(500, CHAT.errors.down);
+  }
+}
+
+async function handle(req: Request, { env, ip, dev = false }: { env: Env; ip: string; dev?: boolean }): Promise<Response> {
+  if (req.method !== 'POST') return json(405, CHAT.errors.badRequest, { Allow: 'POST' });
+  if (!originAllowed(req.headers.get('origin'), env, { dev })) {
+    logFail(`rejected origin ${JSON.stringify((req.headers.get('origin') ?? 'none').slice(0, 100))}`);
+    return json(403, CHAT.errors.forbidden);
+  }
 
   const parsed = await parse(req);
-  if (!parsed.ok) return json(parsed.status, parsed.error);
+  if (!parsed.ok) { logFail(`bad request (${parsed.status})`); return json(parsed.status, parsed.error); }
 
   const rl = rateLimit(ip);
-  if (!rl.ok) return json(429, chat.errors.rateLimited, { 'Retry-After': String(rl.retryAfter) });
+  if (!rl.ok) { logFail('rate limited (per-IP limit reached)'); return json(429, CHAT.errors.rateLimited, { 'Retry-After': String(rl.retryAfter) }); }
 
   const key = env.GROQ_API_KEY;
-  if (!key) { console.error('[chat] GROQ_API_KEY is not set'); refund(ip); return json(503, chat.errors.down); }
+  if (!key) { logFail('missing GROQ_API_KEY: set it in the Vercel project environment variables'); refund(ip); return json(503, CHAT.errors.down); }
 
   // Main model first; if it answers 429 or 5xx (before any text exists), retry once on the fallback model.
   // The switch only ever happens here, before streaming starts, so an answer never changes model halfway.
@@ -123,19 +144,20 @@ export async function handleChat(req: Request, { env, ip, dev = false }: { env: 
     try {
       r = await callGroq(key, model, parsed.messages, Math.max(1000, deadline - Date.now()));
     } catch (e) {
-      console.error('[chat] Groq unreachable:', (e as Error).name);
+      logFail(`Groq unreachable (${(e as Error).name}) for ${model}`);
       refund(ip);
-      return json(503, chat.errors.down);
+      return json(503, CHAT.errors.down);
     }
     if (r.ok && r.body) { upstream = r; break; }
-    console.error(`[chat] Groq responded ${r.status} (${model})`);
+    logFail(`Groq responded ${r.status} for ${model}`);
     await r.body?.cancel().catch(() => {});
     if (r.status === 429) { sawBusy = true; retryAfter = r.headers.get('retry-after') ?? retryAfter; }
     if (r.status !== 429 && r.status < 500) break; // 4xx like a bad key: retrying won't help
   }
   if (!upstream?.body) {
+    logFail(sawBusy ? 'all models busy (Groq 429): answered "busy"' : 'all models failed: answered "offline"');
     refund(ip);
-    return sawBusy ? json(503, chat.errors.busy, { 'Retry-After': retryAfter ?? '30' }) : json(502, chat.errors.down);
+    return sawBusy ? json(503, CHAT.errors.busy, { 'Retry-After': retryAfter ?? '30' }) : json(502, CHAT.errors.down);
   }
 
   // Re-stream Groq's SSE as plain text deltas. Provider details stay on the server.
@@ -162,8 +184,8 @@ export async function handleChat(req: Request, { env, ip, dev = false }: { env: 
           }
         }
       } catch (e) {
-        console.error('[chat] stream interrupted:', (e as Error).name);
-        controller.enqueue(enc.encode('\n\n' + chat.errors.cutOff));
+        logFail(`stream interrupted (${(e as Error).name})`);
+        controller.enqueue(enc.encode('\n\n' + CHAT.errors.cutOff));
       }
       controller.close();
     },
